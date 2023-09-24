@@ -1,0 +1,73 @@
+#passing the environment variables
+pipeline {
+    agent any
+    stages {
+        stage('Example') {
+            steps {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+            }
+        }
+    }
+}
+
+---
+#passing environment variables Globel and stage level
+pipeline {
+    agent any
+    environment {
+        CC = 'clang' #top level 
+    }
+    stages {
+        stage('Example') {
+            environment {
+                DEBUG_FLAGS = '-g'  #stage level
+            }
+            steps {
+                sh 'printenv'
+            }
+        }
+    }
+}
+
+---
+# Handling credential with environment variables
+pipeline {
+    agent any
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('jenkins-aws-secret-access-key')
+    }
+    stages {
+        stage('Example stage 1') {
+            steps {
+                echo "id ${AWS_ACCESS_KEY_ID}"
+            }
+        }
+        stage('Example stage 2') {
+            steps {
+                echo "id ${AWS_SECRET_ACCESS_KEY}"
+            }
+        }
+    }
+}
+
+---
+# Kubernetes config files
+pipeline {
+    agent {
+        // Define agent details here
+    }
+    environment {
+        // The MY_KUBECONFIG environment variable will be assigned
+        // the value of a temporary file.  For example:
+        //   /home/user/.jenkins/workspace/cred_test@tmp/secretFiles/546a5cf3-9b56-4165-a0fd-19e2afe6b31f/kubeconfig.txt
+        MY_KUBECONFIG = credentials('my-kubeconfig')
+    }
+    stages {
+        stage('Example stage 1') {
+            steps {
+                sh("kubectl --kubeconfig $MY_KUBECONFIG get pods")
+            }
+        }
+    }
+}

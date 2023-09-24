@@ -1,0 +1,48 @@
+pipeline {
+    agent none #no agents are assigned on Globel
+    stages {
+        stage('Build') {
+            agent any
+            steps {
+                checkout scm
+            }
+        }
+        stage('Test on Linux') { #Linux environment
+            agent {
+                label 'linux'
+            }
+            steps {
+                unstash 'app'
+                sh 'make check'
+            }
+            post {
+                always {
+                    junit '**/target/*.xml'
+                }
+            }
+        }
+        stage('Test on Windows') { #windows environment
+            agent {
+                label 'windows'
+            }
+            steps {
+                unstash 'app'
+                bat 'make check'
+            }
+            post {
+                always {
+                    junit '**/target/*.xml'
+                }
+            }
+        }
+    }
+}
+
+---
+#specific workspace in agents to run the jenkinsfile
+agent {
+    node {
+        label 'my-defined-label'
+        customWorkspace '/some/other/path' # provide the path
+    }
+}

@@ -1,0 +1,17 @@
+pipeline {
+    agent any
+    options {
+        timeout(time: 1, unit: 'HOURS')
+        buildDiscarder(logRotator(numToKeepStr: '1'))
+        disableConcurrentBuilds(abortPrevious: true)
+        quietPeriod(30)
+        timestamps()
+    }
+    stages {
+        stage('Example') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+    }
+}

@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+    stages{
+        stage('Build') {
+        /* .. snip .. */
+        }
+
+        stage('Test') {
+            steps {
+                parallel (
+                    linux: {
+                        echo "Linux"
+                    }
+                    windows: {
+                        echo "Windows"
+                    }
+                )
+            }
+        }
+    }
+}
